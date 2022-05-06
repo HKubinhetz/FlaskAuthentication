@@ -81,6 +81,7 @@ def logout():
 
 @app.route('/download')
 def download():
+    # Download routing, for when user clicks the download link.
     return send_from_directory("static/files", "cheat_sheet.pdf")
 
 
