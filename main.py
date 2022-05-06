@@ -5,7 +5,7 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, cur
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'any-secret-key-you-choose'
+app.config['SECRET_KEY'] = 'bunny-pig'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -20,6 +20,7 @@ class User(UserMixin, db.Model):
 # Line below only required once, when creating DB.
 # db.create_all()
 
+
 # todo tive problemas para rodar esse arquivo e tava rodando o server anterior.
 # todo como rodar varios servers na mesma maquina erro etc
 @app.route('/')
@@ -27,10 +28,26 @@ def home():
     return render_template("index.html")
 
 
-@app.route('/register')
+@app.route('/register', methods=["GET", "POST"])
 def register():
-    return render_template("register.html")
 
+    if request.method == "POST":
+        form_name = request.form['name']
+        form_email = request.form['email']
+        form_password = request.form['password']
+
+        new_user = User()
+        new_user.name = form_name
+        new_user.password = form_password
+        new_user.email = form_email
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        return render_template("secrets.html", name=new_user.name)
+
+    else:
+        return render_template("register.html")
 
 @app.route('/login')
 def login():
