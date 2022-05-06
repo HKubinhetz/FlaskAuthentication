@@ -1,4 +1,5 @@
 # ---------------------------------- IMPORTS ----------------------------------
+import werkzeug.security
 from flask import Flask, render_template, request, url_for, redirect, flash, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
@@ -41,9 +42,14 @@ def register():
 
     if request.method == "POST":
         # If POST method, that means user is submitting the registration form.
+
         form_name = request.form['name']            # Fetching name
         form_email = request.form['email']          # Fetching email
-        form_password = request.form['password']    # Fetching password
+
+        # Fetching and encrypting password
+        form_password = werkzeug.security.generate_password_hash(request.form['password'],
+                                                                 method='pbkdf2:sha256',
+                                                                 salt_length=8)
 
         # Creating a User class and building its attributes with the form answers.
         new_user = User()
