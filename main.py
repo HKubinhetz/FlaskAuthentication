@@ -6,19 +6,22 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, cur
 
 
 # -------------------------------- FLASK CONFIG -------------------------------
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'bunny-pig'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+app = Flask(__name__)                                                   # Flask App creation
+app.config['SECRET_KEY'] = 'bunny-pig'                                  # Secret Key creation
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'            # DB Link
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False                    # Turning off outdated configs
+db = SQLAlchemy(app)                                                    # Creating Database App
 
 
-# --------------------------------- DB CONFIG ---------------------------------
+# ---------------------------------- CLASSES ----------------------------------
 class User(UserMixin, db.Model):
+    # User class represents DB structure and is the base for the entire
+    # login and registration in the website.
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
     name = db.Column(db.String(1000))
+
 # Line below only required once, when creating DB.
 # db.create_all()
 
@@ -26,28 +29,37 @@ class User(UserMixin, db.Model):
 # ---------------------------------- ROUTING ----------------------------------
 @app.route('/')
 def home():
+    # Home routing, for a first access to the website.
+    # When called, the homepage will be rendered.
     return render_template("index.html")
 
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
+    # Register routing, this is for when a user wants to register in the website.
+    # It get a name, an e-mail and the password, then stores it in the database.
 
     if request.method == "POST":
-        form_name = request.form['name']
-        form_email = request.form['email']
-        form_password = request.form['password']
+        # If POST method, that means user is submitting the registration form.
+        form_name = request.form['name']            # Fetching name
+        form_email = request.form['email']          # Fetching email
+        form_password = request.form['password']    # Fetching password
 
+        # Creating a User class and building its attributes with the form answers.
         new_user = User()
         new_user.name = form_name
         new_user.password = form_password
         new_user.email = form_email
 
+        # Adding and commiting the new user to the Database.
         db.session.add(new_user)
         db.session.commit()
 
+        # Finally, returning the secret file from the website for download.
         return render_template("secrets.html", name=new_user.name)
 
     else:
+        # If the page is first loading, the register form is loaded.
         return render_template("register.html")
 
 
@@ -58,6 +70,7 @@ def login():
 
 @app.route('/secrets')
 def secrets():
+    # Secrets routing, where the user can download a secret file.
     return render_template("secrets.html")
 
 
@@ -68,7 +81,7 @@ def logout():
 
 @app.route('/download')
 def download():
-    pass
+    return send_from_directory("static/files", "cheat_sheet.pdf")
 
 
 # --------------------------------- EXECUTION ---------------------------------
