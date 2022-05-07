@@ -29,6 +29,12 @@ class User(UserMixin, db.Model):
 # db.create_all()
 
 
+@login_manager.user_loader
+def load_user(user_id):
+    # Load user functionality
+    return User.get(user_id)
+
+
 # ---------------------------------- ROUTING ----------------------------------
 @app.route('/')
 def home():
