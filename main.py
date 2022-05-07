@@ -12,6 +12,8 @@ app.config['SECRET_KEY'] = 'bunny-pig'                                  # Secret
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'            # DB Link
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False                    # Turning off outdated configs
 db = SQLAlchemy(app)                                                    # Creating Database App
+login_manager = LoginManager()                                          # Login Manager
+login_manager.init_app(app)                                             # Initializing Login Manager
 
 
 # ---------------------------------- CLASSES ----------------------------------
