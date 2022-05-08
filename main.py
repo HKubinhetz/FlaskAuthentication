@@ -97,6 +97,7 @@ def login():
 @app.route('/secrets')
 def secrets():
     # Secrets routing, where the user can download a secret file.
+    # TODO - Block unauthenticated users
     return render_template("secrets.html")
 
 
@@ -108,6 +109,7 @@ def logout():
 @app.route('/download')
 def download():
     # Download routing, for when user clicks the download link.
+    # TODO - Block unauthenticated users
     return send_from_directory("static/files", "cheat_sheet.pdf")
 
 
