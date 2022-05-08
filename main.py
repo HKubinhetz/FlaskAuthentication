@@ -88,12 +88,23 @@ def login():
 
         # Step 1 - Capturing Login Info
         login_mail = request.form['email']
-        login_password = werkzeug.security.generate_password_hash(request.form['password'],
-                                                                  method='pbkdf2:sha256',
-                                                                  salt_length=8)
+
         # Step 2 - Fetching the DB for this user
-        active_user = db.session.query(User).filter_by(email=login_mail)
-        print(active_user)
+        active_user = db.session.query(User).filter_by(email=login_mail).first()
+
+        # Step 3 - Check if password is correct
+        try:
+            # Checks for password
+            check_hash = werkzeug.security.check_password_hash(active_user.password, request.form['password'])
+        except AttributeError:
+            # Username not Found
+            check_hash = False
+            # Return an error message!
+
+        if check_hash:
+            print("Passwords Match")
+        else:
+            print("Username and password combination not found!")
 
         # Retrieves username from DB by ID (capture exception if there is no such user)
         # werkzeug.security.check_password_hash(pwhash, password)
