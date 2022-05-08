@@ -5,15 +5,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 
-
 # -------------------------------- FLASK CONFIG -------------------------------
-app = Flask(__name__)                                                   # Flask App creation
-app.config['SECRET_KEY'] = 'bunny-pig'                                  # Secret Key creation
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'            # DB Link
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False                    # Turning off outdated configs
-db = SQLAlchemy(app)                                                    # Creating Database App
-login_manager = LoginManager()                                          # Login Manager
-login_manager.init_app(app)                                             # Initializing Login Manager
+app = Flask(__name__)  # Flask App creation
+app.config['SECRET_KEY'] = 'bunny-pig'  # Secret Key creation
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'  # DB Link
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Turning off outdated configs
+db = SQLAlchemy(app)  # Creating Database App
+login_manager = LoginManager()  # Login Manager
+login_manager.init_app(app)  # Initializing Login Manager
 
 
 # ---------------------------------- CLASSES ----------------------------------
@@ -25,6 +24,7 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(100))
     name = db.Column(db.String(1000))
     auth_flag = UserMixin.is_authenticated
+
 
 # Line below only required once, when creating DB.
 # db.create_all()
@@ -52,8 +52,8 @@ def register():
     if request.method == "POST":
         # If POST method, that means user is submitting the registration form.
 
-        form_name = request.form['name']            # Fetching name
-        form_email = request.form['email']          # Fetching email
+        form_name = request.form['name']  # Fetching name
+        form_email = request.form['email']  # Fetching email
 
         # Fetching and encrypting password
         form_password = werkzeug.security.generate_password_hash(request.form['password'],
@@ -85,6 +85,16 @@ def login():
 
     if request.method == "POST":
         # If POST method, user is submitting login information.
+
+        # Step 1 - Capturing Login Info
+        login_mail = request.form['email']
+        login_password = werkzeug.security.generate_password_hash(request.form['password'],
+                                                                  method='pbkdf2:sha256',
+                                                                  salt_length=8)
+        # Step 2 - Fetching the DB for this user
+        active_user = db.session.query.filter_by(email=login_mail)
+        print(active_user)
+
         # Retrieves username from DB by ID (capture exception if there is no such user)
         # werkzeug.security.check_password_hash(pwhash, password)
         # user.is_authenticated = True
