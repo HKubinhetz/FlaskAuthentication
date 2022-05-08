@@ -32,7 +32,7 @@ class User(UserMixin, db.Model):
 
 @login_manager.user_loader
 def load_user(user_id):
-    # Load user functionality
+    # Loads user functionality
     return User.get(user_id)
 
 
@@ -80,6 +80,17 @@ def register():
 
 @app.route('/login')
 def login():
+    # Here the user inputs his login and password,
+    # then the password is checked through the check_password_hash function.
+
+    if request.method == "POST":
+        # If POST method, user is submitting login information.
+        # Retrieves username from DB by ID (capture exception if there is no such user)
+        # werkzeug.security.check_password_hash(pwhash, password)
+        # user.is_authenticated = True
+        # Render secrets page!
+        pass
+
     return render_template("login.html")
 
 
