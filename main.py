@@ -78,7 +78,7 @@ def register():
         return render_template("register.html")
 
 
-@app.route('/login')
+@app.route('/login', methods=["GET", "POST"])
 def login():
     # Here the user inputs his login and password,
     # then the password is checked through the check_password_hash function.
@@ -92,7 +92,7 @@ def login():
                                                                   method='pbkdf2:sha256',
                                                                   salt_length=8)
         # Step 2 - Fetching the DB for this user
-        active_user = db.session.query.filter_by(email=login_mail)
+        active_user = db.session.query(User).filter_by(email=login_mail)
         print(active_user)
 
         # Retrieves username from DB by ID (capture exception if there is no such user)
