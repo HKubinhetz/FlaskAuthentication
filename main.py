@@ -122,7 +122,7 @@ def login():
 @app.route('/secrets')
 def secrets():
     # Secrets routing, where the user can download a secret file.
-    # TODO - Block unauthenticated users
+    # TODO - Block unauthenticated users that try to access it directly
     return render_template("secrets.html")
 
 
