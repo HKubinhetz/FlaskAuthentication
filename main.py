@@ -134,7 +134,7 @@ def logout():
 @app.route('/download')
 def download():
     # Download routing, for when user clicks the download link.
-    # TODO - Block unauthenticated users
+    # TODO - Block unauthenticated users that try to access it directly
     return send_from_directory("static/files", "cheat_sheet.pdf")
 
 
