@@ -28,7 +28,9 @@ class User(UserMixin, db.Model):
 
 # Line below only required once, when creating DB.
 # db.create_all()
-
+# TODO - Continue
+# https://flask-login.readthedocs.io/en/latest/
+# https://www.udemy.com/course/100-days-of-code/learn/lecture/22829885
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -103,8 +105,10 @@ def login():
 
         if check_hash:
             print("Passwords Match")
+            return render_template("secrets.html", name=active_user.name)
         else:
             print("Username and password combination not found!")
+            return render_template("login.html")
 
         # Retrieves username from DB by ID (capture exception if there is no such user)
         # werkzeug.security.check_password_hash(pwhash, password)
