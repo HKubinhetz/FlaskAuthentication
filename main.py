@@ -32,10 +32,10 @@ class User(UserMixin, db.Model):
 # https://flask-login.readthedocs.io/en/latest/
 # https://www.udemy.com/course/100-days-of-code/learn/lecture/22829885
 
-@login_manager.user_loader
-def load_user(user_id):
-    # Loads user functionality
-    return User.get(user_id)
+# @login_manager.user_loader
+# def load_user(user_id):
+#     # Loads user functionality
+#     return User.get(user_id)
 
 
 # ---------------------------------- ROUTING ----------------------------------
@@ -105,7 +105,7 @@ def login():
 
         if check_hash:
             print("Passwords Match")
-            active_user.auth_flag = True
+            login_user(active_user)
             return render_template("secrets.html", name=active_user.name)
         else:
             print("Username and password combination not found!")
