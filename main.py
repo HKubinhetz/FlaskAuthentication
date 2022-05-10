@@ -105,6 +105,7 @@ def login():
 
         if check_hash:
             print("Passwords Match")
+            active_user.auth_flag = True
             return render_template("secrets.html", name=active_user.name)
         else:
             print("Username and password combination not found!")
@@ -120,6 +121,7 @@ def login():
 
 
 @app.route('/secrets')
+@login_required
 def secrets():
     # Secrets routing, where the user can download a secret file.
     # TODO - Block unauthenticated users that try to access it directly
@@ -132,6 +134,7 @@ def logout():
 
 
 @app.route('/download')
+@login_required
 def download():
     # Download routing, for when user clicks the download link.
     # TODO - Block unauthenticated users that try to access it directly
