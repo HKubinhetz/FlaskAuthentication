@@ -34,7 +34,7 @@ class User(UserMixin, db.Model):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.get(user_id)
+    return User.query.filter_by(id=user_id).first()
 
 
 # ---------------------------------- ROUTING ----------------------------------
@@ -71,7 +71,9 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        # Finally, returning the secret file from the website for download.
+        # Finally, returning the secret file from the website for download,
+        # while already authenticating the user.
+        login_user(new_user)
         return render_template("secrets.html", name=new_user.name)
 
     else:
@@ -128,8 +130,10 @@ def secrets():
 
 
 @app.route('/logout')
+@login_required
 def logout():
-    pass
+    logout_user()
+    return redirect("index.html")
 
 
 @app.route('/download')
