@@ -32,10 +32,9 @@ class User(UserMixin, db.Model):
 # https://flask-login.readthedocs.io/en/latest/
 # https://www.udemy.com/course/100-days-of-code/learn/lecture/22829885
 
-# @login_manager.user_loader
-# def load_user(user_id):
-#     # Loads user functionality
-#     return User.get(user_id)
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
 
 
 # ---------------------------------- ROUTING ----------------------------------
