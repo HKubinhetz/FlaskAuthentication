@@ -2,6 +2,7 @@
 import werkzeug.security
 from flask import Flask, render_template, request, url_for, redirect, flash, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.exc import IntegrityError, InvalidRequestError
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 
@@ -25,12 +26,6 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(1000))
     auth_flag = UserMixin.is_authenticated
 
-
-# Line below only required once, when creating DB.
-# db.create_all()
-# TODO - Continue
-# https://flask-login.readthedocs.io/en/latest/
-# https://www.udemy.com/course/100-days-of-code/learn/lecture/22829885
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -57,9 +52,9 @@ def register():
         form_email = request.form['email']  # Fetching email
 
         # Fetching and encrypting password
-        form_password = werkzeug.security.generate_password_hash(request.form['password'],
-                                                                 method='pbkdf2:sha256',
-                                                                 salt_length=8)
+        form_password = generate_password_hash(request.form['password'],
+                                               method='pbkdf2:sha256',
+                                               salt_length=8)
 
         # Creating a User class and building its attributes with the form answers.
         new_user = User()
@@ -68,13 +63,18 @@ def register():
         new_user.email = form_email
 
         # Adding and commiting the new user to the Database.
-        db.session.add(new_user)
-        db.session.commit()
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            # Finally, returning the secret file from the website for download,
+            # while already authenticating the user.
+            login_user(new_user)
+            return render_template("secrets.html", name=new_user.name)
 
-        # Finally, returning the secret file from the website for download,
-        # while already authenticating the user.
-        login_user(new_user)
-        return render_template("secrets.html", name=new_user.name)
+        except IntegrityError or InvalidRequestError:
+            # User already registered (unique email):
+            flash_register = "Username already exists! Proceed to login!"
+            return render_template("register.html", flash=flash_register)
 
     else:
         # If the page is first loading, the register form is loaded.
@@ -98,25 +98,18 @@ def login():
         # Step 3 - Check if password is correct
         try:
             # Checks for password
-            check_hash = werkzeug.security.check_password_hash(active_user.password, request.form['password'])
+            check_hash = check_password_hash(active_user.password, request.form['password'])
         except AttributeError:
             # Username not Found
             check_hash = False
             # Return an error message!
 
         if check_hash:
-            print("Passwords Match")
             login_user(active_user)
             return render_template("secrets.html", name=active_user.name)
         else:
-            print("Username and password combination not found!")
-            return render_template("login.html")
-
-        # Retrieves username from DB by ID (capture exception if there is no such user)
-        # werkzeug.security.check_password_hash(pwhash, password)
-        # user.is_authenticated = True
-        # Render secrets page!
-        pass
+            login_flash = "Username and password combination not found!"
+            return render_template("login.html", flash=login_flash)
 
     return render_template("login.html")
 
@@ -125,7 +118,6 @@ def login():
 @login_required
 def secrets():
     # Secrets routing, where the user can download a secret file.
-    # TODO - Block unauthenticated users that try to access it directly
     return render_template("secrets.html")
 
 
@@ -133,14 +125,13 @@ def secrets():
 @login_required
 def logout():
     logout_user()
-    return redirect("index.html")
+    return redirect(url_for('home'))
 
 
 @app.route('/download')
 @login_required
 def download():
     # Download routing, for when user clicks the download link.
-    # TODO - Block unauthenticated users that try to access it directly
     return send_from_directory("static/files", "cheat_sheet.pdf")
 
 

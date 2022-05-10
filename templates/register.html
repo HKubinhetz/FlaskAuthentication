@@ -4,6 +4,7 @@
 <div class="box">
 	<h1>Register</h1>
     <form action="{{ url_for('register') }}" method="post" novalidate>
+        <p class="flashes">{{ flash }}</p>
     	<input type="text" name="name" placeholder="Name" required="required" />
 		<input type="email" name="email" placeholder="Email" required="required" />
         <input type="password" name="password" placeholder="Password" required="required" />
