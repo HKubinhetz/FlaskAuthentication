@@ -124,6 +124,7 @@ def secrets():
 @app.route('/logout')
 @login_required
 def logout():
+    # Logout routing, for when the user logs out of its account.
     logout_user()
     return redirect(url_for('home'))
 
